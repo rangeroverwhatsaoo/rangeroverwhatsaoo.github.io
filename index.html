@@ -378,6 +378,25 @@ fbq('track','ViewContent',{content_name:'Range Rover Sport 2021',value:5200000,c
       </a>
     </div>
   </div>
+<script>
+(function(){
+  var EP="https://rr-events-production-6e5cacb3.up.railway.app/e";
+  function rid(){return Math.random().toString(36).slice(2)+Date.now().toString(36);}
+  var vid; try{vid=localStorage.getItem('rr_vid'); if(!vid){vid=rid(); localStorage.setItem('rr_vid',vid);} }catch(e){vid=rid();}
+  var sid=rid(), qs=new URLSearchParams(location.search), t0=Date.now(), maxS=0, sentEng=false;
+  var utm={source:qs.get('utm_source'),medium:qs.get('utm_medium'),campaign:qs.get('utm_campaign'),content:qs.get('utm_content'),term:qs.get('utm_term')};
+  var ua=navigator.userAgent, dev=/iPad|Tablet/i.test(ua)?'tablet':(/Mobi|Android|iPhone/i.test(ua)?'mobile':'desktop');
+  var test=qs.get('rrtest')==='1';
+  function send(ev,p){ var b=JSON.stringify({ev:ev,p:p||{},sid:sid,vid:vid,url:location.href,ref:document.referrer,utm:utm,dev:dev,test:test});
+    try{ if(navigator.sendBeacon && navigator.sendBeacon(EP,b)) return; }catch(e){}
+    try{ fetch(EP,{method:'POST',body:b,keepalive:true,mode:'no-cors'}); }catch(e){} }
+  window.rrTrack=send;
+  send('page_view',{w:screen.width,h:screen.height,lang:navigator.language});
+  addEventListener('scroll',function(){ var d=document.documentElement, s=Math.round(100*(scrollY+innerHeight)/Math.max(d.scrollHeight,1)); if(s>maxS)maxS=Math.min(s,100); },{passive:true});
+  function eng(){ if(sentEng)return; sentEng=true; send('engagement',{sec:Math.round((Date.now()-t0)/1000),scroll:maxS}); }
+  addEventListener('pagehide',eng); document.addEventListener('visibilitychange',function(){ if(document.visibilityState==='hidden')eng(); });
+})();
+</script>
 <div id="q" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:99;align-items:center;justify-content:center;padding:18px">
  <form id="qf" style="background:#141414;border:1px solid rgba(201,169,110,.35);border-radius:12px;max-width:420px;width:100%;padding:22px;color:#f0e8d8;font-size:15px">
   <p style="font-weight:600;margin-bottom:6px">Quick check before WhatsApp</p>
@@ -397,11 +416,12 @@ fbq('track','ViewContent',{content_name:'Range Rover Sport 2021',value:5200000,c
 (function(){
   var base="https://wa.me/639150544080?text=";
   var q=document.getElementById('q');
-  document.querySelectorAll('a.btn-wa').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); q.style.display='flex'; try{fbq('trackCustom','WAQualifierOpen');}catch(x){} }); });
+  document.querySelectorAll('a.btn-wa').forEach(function(a){ a.addEventListener('click',function(e){ e.preventDefault(); q.style.display='flex'; try{rrTrack('qualifier_open',{btn:a.closest('.cta-bar')?'sticky':'top'});}catch(x){} try{fbq('trackCustom','WAQualifierOpen');}catch(x){} }); });
   document.getElementById('qf').addEventListener('submit',function(e){
     e.preventDefault();
     var f=new FormData(this), pay=f.get('pay'), when=f.get('when');
     var hot=(pay!=='Just looking' && when!=='Later');
+    try{ rrTrack('answer',{pay:pay,when:when,hot:hot?'hot':'cold'}); rrTrack('whatsapp_tap',{hot:hot?'hot':'cold'}); }catch(x){}
     try{
       if(hot){ fbq('track','Lead',{content_name:'Range Rover Sport 2021',value:5200000,currency:'PHP',pay:pay,when:when}); }
       fbq('trackCustom','WAQualified',{pay:pay,when:when,hot:hot?1:0});
